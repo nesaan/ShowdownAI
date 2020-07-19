@@ -1,12 +1,32 @@
 {
-  "Pikachu" : {
-    "hp": 211,
-    "atk": 229,
-    "defn": 116,
-    "spatk": 137,
-    "spdef": 122,
-    "spd": 279,
-    "moves": ["thunderbolt", "earthquake"],
-    "types": ["electric"]
+  "Alakazam": {
+    "hp": 251,
+    "atk": 94,
+    "defn": 126,
+    "spatk": 369,
+    "spdef": 227,
+    "spd": 372,
+    "moves": ["psychic", "shadow ball", "focus blast", "dazzling gleam"],
+    "types": ["psychic"]
+  },
+  "Victini": {
+    "hp": 404,
+    "atk": 237,
+    "defn": 236,
+    "spatk": 212,
+    "spdef": 236,
+    "spd": 328,
+    "moves": ["v-create", "bolt strike", "final gambit", "zen headbutt"],
+    "types": ["psychic", "fire"]
+  },
+  "Araquanid": {
+    "hp": 340,
+    "atk": 262,
+    "defn": 221,
+    "spatk": 122,
+    "spdef": 300,
+    "spd": 120,
+    "moves": ["liquidation", "crunch", "poison jab", "x-scissor"],
+    "types": ["bug", "water"]
   }
 }

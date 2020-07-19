@@ -32,10 +32,10 @@ class Poke:
 
     if move.physical:
       effectiveAtk = self.atk * self.modifiers["atk"]
-      effectiveDef = self.defn * self.modifiers["defn"]
+      effectiveDef = other.defn * other.modifiers["defn"]
     else:
       effectiveAtk = self.spatk * self.modifiers["spatk"]
-      effectiveDef = self.spdef * self.modifiers["spdef"]
+      effectiveDef = other.spdef * other.modifiers["spdef"]
     
     damage = ((200/5 + 2) * move.bp * (effectiveAtk/effectiveDef)/50 + 2)
     targets = 1
@@ -66,37 +66,46 @@ class Move:
 class Battle:
   def __init__(self, ai):
     self.ai = ai
-    self.team1 = [Poke("Pikachu")]
-    self.team2 = [Poke("Pikachu")]
+    self.team1 = [Poke("Pikachu"), Poke("Alakazam")]
+    self.team2 = [Poke("Alakazam"), Poke("Pikachu")]
     self.active1 = self.team1[0]
     self.active2 = self.team2[0]
   
   def isGameOver(self):
-    return all([mon.curHp <= 0 for mon in self.team1]) or all([mon.curHp <= 0 for mon in self.team2])
+    return all(mon.curHp <= 0 for mon in self.team1) or all(mon.curHp <= 0 for mon in self.team2)
   
   def executeAiAction(self, action):
     if isinstance(action, Poke):
       self.active2 = action
-      print("AI switched to {0}".format(action.name))
+      print("AI switched to {0}\n".format(action.name))
     else:
       if self.active2.curHp <= 0:
         return
-      print("AI used {0}".format(action.name))
+      print("AI's {0} used {1}".format(self.active2.name, action.name))
       damage = self.active2.useMove(action, self.active1)
-      print("Player's {0} took {1} damage".format(self.active1.name, damage))
+      print("Player's {0} took {1} damage\n".format(self.active1.name, damage))
 
   def executePAction(self, action):
     if isinstance(action, Poke):
-      self.active1 = Poke
-      print("Player switched to {0}".format(action.name))
+      self.active1 = action
+      print("Player switched to {0}\n".format(action.name))
     else:
       if self.active1.curHp <= 0:
         return
-      print("Player used {0}".format(action.name))
+      print("Player's {0} used {1}".format(self.active1.name, action.name))
       damage = self.active1.useMove(action, self.active2)
-      print("Ai's {0} took {1} damage".format(self.active2.name, damage))
+      print("Ai's {0} took {1} damage\n".format(self.active2.name, damage))
   
   def makeMove(self, pmove):
+    if self.active1.curHp <= 0:
+      if isinstance(pmove, Poke):
+        self.active1 = pmove
+      return
+
+    #maybe should check later but i am assuming the ai never makes invalaid moves, but player might because they are either a human or a training ai
+    if isinstance(pmove, Poke) and pmove.curHp <= 0:
+      return
+
     aimove = self.ai.chooseAction(self.active2, self.team2, self.active1, self.team1)
 
     aiprio = aimove.prio * 10000 + self.active2.spd
@@ -117,6 +126,14 @@ class Battle:
       else:
         self.executePAction(pmove)
         self.executeAiAction(aimove)
+    
+    if not self.isGameOver():
+      while self.active2.curHp <= 0:
+        aimove = self.ai.chooseAction(self.active2, self.team2, self.active1, self.team1)
+        if not isinstance(aimove, Poke):
+          raise Exception("Really bad AI choice, is this guy trained?")
+        self.active2 = aimove
+
 
 
   def __repr__(self):
@@ -124,6 +141,7 @@ class Battle:
     lines.append("Active Player Pokemon: {0} - {1}/{2}".format(self.active1.name, self.active1.curHp, self.active1.hp))
     lines.append("")
     lines.append("AI Player Pokemon: {0} - {1}/{2}".format(self.active2.name, self.active2.curHp, self.active2.hp))
-
+    lines.append("")
+    lines.append("")
 
     return "\n".join(lines)

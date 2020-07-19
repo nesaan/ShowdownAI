@@ -12,5 +12,33 @@
     "type": "ground",
     "physical": true,
     "prio": 1
+  },
+  "psychic":{
+    "bp": 90,
+    "acc": 1,
+    "type": "psychic",
+    "physical": false,
+    "prio": 1
+  },
+  "shadow ball":{
+    "bp": 80,
+    "acc": 1,
+    "type": "ghost",
+    "physical": false,
+    "prio": 1
+  },
+  "focus blast":{
+    "bp": 120,
+    "acc": 0.7,
+    "type": "fight",
+    "physical": false,
+    "prio": 1
+  },
+  "dazzling gleam":{
+    "bp": 80,
+    "acc": 1,
+    "type": "fairy",
+    "physical": false,
+    "prio": 1
   }
 }
