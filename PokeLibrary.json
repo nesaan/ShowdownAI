@@ -1,0 +1,12 @@
+{
+  "Pikachu" : {
+    "hp": 211,
+    "atk": 229,
+    "defn": 116,
+    "spatk": 137,
+    "spdef": 122,
+    "spd": 279,
+    "moves": ["thunderbolt", "earthquake"],
+    "types": ["electric"]
+  }
+}

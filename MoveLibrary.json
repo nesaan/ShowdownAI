@@ -1,0 +1,16 @@
+{
+  "thunderbolt" : {
+    "bp" : 90,
+    "acc" : 1, 
+    "type": "electric",
+    "physical": false,
+    "prio": 1
+  },
+  "earthquake": {
+    "bp": 100,
+    "acc": 1,
+    "type": "ground",
+    "physical": true,
+    "prio": 1
+  }
+}
