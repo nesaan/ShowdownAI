@@ -116,6 +116,11 @@ class Battle:
     
     if self.active1.curHp <= 0:
       if isinstance(pmove, Poke):
+        if self.active2.curHp <= 0:
+          aimove = self.ai.chooseAction(self.active2, self.team2, self.active1, self.team1)
+          if isinstance(aimove, Move):
+            raise Exception("Reallyyy bad AI choice, is this guy trained?")
+          self.executeAiAction(aimove)
         self.executePAction(pmove)
       return
 
@@ -143,7 +148,8 @@ class Battle:
         self.executeAiAction(aimove)
     
     if not self.isGameOver():
-      while self.active2.curHp <= 0:
+      #so when ai's mon is dead, it can choose a new mon, unless both are dead, in which case it has to be done on a simutaneous turn
+      while self.active2.curHp <= 0 and self.active1.curHp >= 0:
         aimove = self.ai.chooseAction(self.active2, self.team2, self.active1, self.team1)
         if not isinstance(aimove, Poke):
           raise Exception("Really bad AI choice, is this guy trained?")
