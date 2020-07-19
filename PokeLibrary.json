@@ -28,5 +28,15 @@
     "spd": 120,
     "moves": ["liquidation", "crunch", "poison jab", "x-scissor"],
     "types": ["bug", "water"]
+  },
+  "Scizor": {
+    "hp": 323,
+    "atk": 394,
+    "defn": 236,
+    "spatk": 131,
+    "spdef": 197,
+    "spd": 187,
+    "moves": ["bug bite", "bullet punch", "agility", "superpower"],
+    "types": ["bug", "steel"]
   }
 }
