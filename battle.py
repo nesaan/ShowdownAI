@@ -6,7 +6,14 @@ import random
 import type
 import math
 import baseai
-modifiers = ["atk", "spatk", "defn", "spdef", "spd"]
+
+DEFAULT_MODIFIERS = {
+  "atk": 0,
+  "spatk":0,
+  "defn": 0,
+  "spdef": 0,
+  "spd": 0
+}
 
 class Poke:
   def __init__(self, name):
@@ -14,13 +21,17 @@ class Poke:
     POKE_LIB.loadFromName(self)
     self.curHp = self.hp
     #stat boosts
-    self.modifiers = dict(zip(modifiers, [1] * len(modifiers)))
+    self.modifiers = DEFAULT_MODIFIERS.copy()
     self.moves = [Move(x) for x in self.moves]
     #this is how i make choosing to switch happen before regular moves
     self.prio = 9
 
   def stab(self, move):
     return move.type in self.types
+
+  def statboost(self, stat):
+    stage = self.modifiers[stat]
+    return (max(stage, 0) + 2) / (abs(min(stage, 0)) + 2)
 
   def useMove(self, move, other):
     if self.curHp <= 0:
@@ -31,11 +42,11 @@ class Poke:
       return 0
 
     if move.physical:
-      effectiveAtk = self.atk * self.modifiers["atk"]
-      effectiveDef = other.defn * other.modifiers["defn"]
+      effectiveAtk = self.atk * self.statboost("atk")
+      effectiveDef = other.defn * other.statboost("defn")
     else:
-      effectiveAtk = self.spatk * self.modifiers["spatk"]
-      effectiveDef = other.spdef * other.modifiers["spdef"]
+      effectiveAtk = self.spatk * self.statboost("spatk")
+      effectiveDef = other.spdef * other.statboost("spdef")
     
     damage = ((200/5 + 2) * move.bp * (effectiveAtk/effectiveDef)/50 + 2)
     targets = 1
@@ -66,8 +77,8 @@ class Move:
 class Battle:
   def __init__(self, ai):
     self.ai = ai
-    self.team1 = [Poke("Pikachu"), Poke("Alakazam")]
-    self.team2 = [Poke("Alakazam"), Poke("Pikachu")]
+    self.team1 = [Poke("Alakazam")]
+    self.team2 = [Poke("Alakazam")]
     self.active1 = self.team1[0]
     self.active2 = self.team2[0]
   
@@ -77,6 +88,7 @@ class Battle:
   def executeAiAction(self, action):
     if isinstance(action, Poke):
       self.active2 = action
+      action.modifiers = DEFAULT_MODIFIERS.copy()
       print("AI switched to {0}\n".format(action.name))
     else:
       if self.active2.curHp <= 0:
@@ -88,6 +100,7 @@ class Battle:
   def executePAction(self, action):
     if isinstance(action, Poke):
       self.active1 = action
+      action.modifiers = DEFAULT_MODIFIERS.copy()
       print("Player switched to {0}\n".format(action.name))
     else:
       if self.active1.curHp <= 0:
@@ -97,19 +110,21 @@ class Battle:
       print("Ai's {0} took {1} damage\n".format(self.active2.name, damage))
   
   def makeMove(self, pmove):
-    if self.active1.curHp <= 0:
-      if isinstance(pmove, Poke):
-        self.active1 = pmove
-      return
-
     #maybe should check later but i am assuming the ai never makes invalaid moves, but player might because they are either a human or a training ai
     if isinstance(pmove, Poke) and pmove.curHp <= 0:
       return
+    
+    if self.active1.curHp <= 0:
+      if isinstance(pmove, Poke):
+        self.executePAction(pmove)
+      return
 
     aimove = self.ai.chooseAction(self.active2, self.team2, self.active1, self.team1)
+    if isinstance(aimove, Poke) and aimove.curHp <= 0:
+      raise Exception("Reallyy bad AI choice, is this guy trained?")
 
-    aiprio = aimove.prio * 10000 + self.active2.spd
-    pprio = pmove.prio * 10000 + self.active1.spd
+    aiprio = aimove.prio * 10000 + self.active2.spd * self.active2.statboost("spd")
+    pprio = pmove.prio * 10000 + self.active1.spd * self.active1.statboost("spd")
 
     #I'm kind of tired, there is def a less dumb way to do this
     if aiprio > pprio:
@@ -132,7 +147,7 @@ class Battle:
         aimove = self.ai.chooseAction(self.active2, self.team2, self.active1, self.team1)
         if not isinstance(aimove, Poke):
           raise Exception("Really bad AI choice, is this guy trained?")
-        self.active2 = aimove
+        self.executeAiAction(aimove)
 
 
 
