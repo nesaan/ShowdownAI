@@ -15,6 +15,24 @@ DEFAULT_MODIFIERS = {
   "spd": 0
 }
 
+class Move:
+  def __init__(self, name):
+    self.name = name
+    MOVE_LIB.loadFromName(self)
+
+class MoveCache:
+  def __init__(self):
+    self.moves = {}
+
+  def getMove(self, name):
+    if name in self.moves:
+      return self.moves[name]
+    else:
+      self.moves[name] = Move(name)
+      return self.moves[name]
+
+moveCache = MoveCache()
+
 class Poke:
   def __init__(self, name):
     self.name = name
@@ -22,7 +40,7 @@ class Poke:
     self.curHp = self.hp
     #stat boosts
     self.modifiers = DEFAULT_MODIFIERS.copy()
-    self.moves = [Move(x) for x in self.moves]
+    self.moves = [moveCache.getMove(x) for x in self.moves]
     #this is how i make choosing to switch happen before regular moves
     self.prio = 9
 
@@ -66,12 +84,6 @@ class Poke:
       total = max(1, total)
     other.curHp -= total
     return total
-
-
-class Move:
-  def __init__(self, name):
-    self.name = name
-    MOVE_LIB.loadFromName(self)
 
 
 class Battle:
