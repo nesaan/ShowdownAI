@@ -38,5 +38,25 @@
     "spd": 187,
     "moves": ["bug bite", "bullet punch", "agility", "superpower"],
     "types": ["bug", "steel"]
+  },
+  "Excadrill": {
+    "hp": 362,
+    "atk": 405,
+    "defn": 156,
+    "spatk": 122,
+    "spdef": 229,
+    "spd": 212,
+    "moves": ["earthquake", "iron head", "rock slide", "swords dance"],
+    "types": ["ground", "steel"]
+  },
+  "Mega-Latios": {
+    "hp": 301,
+    "atk": 394,
+    "defn": 236,
+    "spatk": 320,
+    "spdef": 277,
+    "spd": 319,
+    "moves": ["dragon dance", "dragon claw", "earthquake", "roost"],
+    "types": ["psychic", "dragon"]
   }
 }

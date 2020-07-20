@@ -1,11 +1,4 @@
 {
-  "thunderbolt" : {
-    "bp" : 90,
-    "acc" : 1, 
-    "type": "electric",
-    "physical": false,
-    "prio": 1
-  },
   "earthquake": {
     "bp": 100,
     "acc": 1,
@@ -38,6 +31,132 @@
     "bp": 80,
     "acc": 1,
     "type": "fairy",
+    "physical": false,
+    "prio": 1
+  },
+  "v-create":{
+    "bp": 180,
+    "acc": 0.95,
+    "type": "fire",
+    "physical": true,
+    "prio": 1
+  },
+  "bolt strike":{
+    "bp": 130,
+    "acc": 0.85,
+    "type": "electric",
+    "physical": true,
+    "prio": 1
+  },
+  "final gambit":{
+    "bp": 0,
+    "acc": 1,
+    "type": "fight",
+    "physical": true,
+    "prio": 1
+  },
+  "zen headbutt":{
+    "bp": 80,
+    "acc": 0.9,
+    "type": "psychic",
+    "physical": true,
+    "prio": 1
+  },
+  "liquidation":{
+    "bp": 85,
+    "acc": 1,
+    "type": "water",
+    "physical": true,
+    "prio": 1
+  },
+  "crunch":{
+    "bp": 80,
+    "acc": 1,
+    "type": "dark",
+    "physical": true,
+    "prio": 1
+  },
+  "poison jab":{
+    "bp": 80,
+    "acc": 1,
+    "type": "poison",
+    "physical": true,
+    "prio": 1
+  },
+  "x-scissor":{
+    "bp": 80,
+    "acc": 1,
+    "type": "bug",
+    "physical": true,
+    "prio": 1
+  },
+  "bug bite":{
+    "bp": 60,
+    "acc": 1,
+    "type": "bug",
+    "physical": true,
+    "prio": 1
+  },
+  "bullet punch":{
+    "bp": 40,
+    "acc": 1,
+    "type": "steel",
+    "physical": true,
+    "prio": 2
+  },
+  "agility":{
+    "bp": 0,
+    "acc": 1,
+    "type": "psychic",
+    "physical": false,
+    "prio": 1
+  },
+  "superpower":{
+    "bp": 120,
+    "acc": 1,
+    "type": "fight",
+    "physical": true,
+    "prio": 1
+  },
+  "iron head":{
+    "bp": 80,
+    "acc": 1,
+    "type": "steel",
+    "physical": true,
+    "prio": 1
+  },
+  "rock slide":{
+    "bp": 75,
+    "acc": 0.9,
+    "type": "rock",
+    "physical": true,
+    "prio": 1
+  },
+  "swords dance":{
+    "bp": 0,
+    "acc": 1,
+    "type": "normal",
+    "physical": false,
+    "prio": 1
+  },
+  "dragon dance":{
+    "bp": 0,
+    "acc": 1,
+    "type": "dragon",
+    "physical": false,
+    "prio": 1
+  },
+  "dragon claw":{
+    "bp": 80,
+    "acc": 1,
+    "type": "dragon",
+    "physical": true,
+    "prio": 1
+  },
+  "roost":{
+    "bp": 0,
+    "acc": 1,
+    "type": "flying",
     "physical": false,
     "prio": 1
   }

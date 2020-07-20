@@ -6,6 +6,7 @@ import random
 import type
 import math
 import baseai
+from secondaryactions import secondarydict
 
 DEFAULT_MODIFIERS = {
   "atk": 0,
@@ -19,6 +20,7 @@ class Move:
   def __init__(self, name):
     self.name = name
     MOVE_LIB.loadFromName(self)
+    self.secondary = secondarydict[name]
 
 class MoveCache:
   def __init__(self):
@@ -43,6 +45,8 @@ class Poke:
     self.moves = [moveCache.getMove(x) for x in self.moves]
     #this is how i make choosing to switch happen before regular moves
     self.prio = 9
+    self.flinch = False
+    self.poison = False
 
   def stab(self, move):
     return move.type in self.types
@@ -80,17 +84,18 @@ class Poke:
 
     
     total = min(math.floor(damage * targets * weather * crit * randf * stab * eff * burn * remainder), other.curHp)
-    if total > 0:
-      total = max(1, total)
     other.curHp -= total
+    if other.curHp > 0:
+      move.secondary(self, other)
+
     return total
 
 
 class Battle:
   def __init__(self, ai):
     self.ai = ai
-    self.team1 = [Poke("Alakazam")]
-    self.team2 = [Poke("Alakazam")]
+    self.team1 = [Poke("Alakazam"), Poke("Victini"), Poke("Araquanid"), Poke("Scizor"), Poke("Excadrill"), Poke("Mega-Latios")]
+    self.team2 = [Poke("Alakazam"), Poke("Victini"), Poke("Araquanid"), Poke("Scizor"), Poke("Excadrill"), Poke("Mega-Latios")]
     self.active1 = self.team1[0]
     self.active2 = self.team2[0]
   
@@ -103,7 +108,7 @@ class Battle:
       action.modifiers = DEFAULT_MODIFIERS.copy()
       print("AI switched to {0}\n".format(action.name))
     else:
-      if self.active2.curHp <= 0:
+      if self.active2.curHp <= 0 or self.active2.flinch:
         return
       print("AI's {0} used {1}".format(self.active2.name, action.name))
       damage = self.active2.useMove(action, self.active1)
@@ -115,7 +120,7 @@ class Battle:
       action.modifiers = DEFAULT_MODIFIERS.copy()
       print("Player switched to {0}\n".format(action.name))
     else:
-      if self.active1.curHp <= 0:
+      if self.active1.curHp <= 0 or self.active1.flinch:
         return
       print("Player's {0} used {1}".format(self.active1.name, action.name))
       damage = self.active1.useMove(action, self.active2)
@@ -123,21 +128,21 @@ class Battle:
   
   def makeMove(self, pmove):
     #maybe should check later but i am assuming the ai never makes invalaid moves, but player might because they are either a human or a training ai
-    if isinstance(pmove, Poke) and pmove.curHp <= 0:
+    if isinstance(pmove, Poke) and (pmove.curHp <= 0 or pmove == self.active1):
       return
     
     if self.active1.curHp <= 0:
       if isinstance(pmove, Poke):
         if self.active2.curHp <= 0:
           aimove = self.ai.chooseAction(self.active2, self.team2, self.active1, self.team1)
-          if isinstance(aimove, Move):
+          if isinstance(aimove, Move) or aimove.curHp <= 0:
             raise Exception("Reallyyy bad AI choice, is this guy trained?")
           self.executeAiAction(aimove)
         self.executePAction(pmove)
       return
 
     aimove = self.ai.chooseAction(self.active2, self.team2, self.active1, self.team1)
-    if isinstance(aimove, Poke) and aimove.curHp <= 0:
+    if isinstance(aimove, Poke) and (aimove.curHp <= 0 or aimove == self.active2):
       raise Exception("Reallyy bad AI choice, is this guy trained?")
 
     aiprio = aimove.prio * 10000 + self.active2.spd * self.active2.statboost("spd")
@@ -159,6 +164,15 @@ class Battle:
         self.executePAction(pmove)
         self.executeAiAction(aimove)
     
+    # post turn cleanup
+    self.active1.flinch = False
+    self.active2.flinch = False
+    if self.active1.poison:
+      self.active1.curHp -= min(self.hp, math.floor(self.hp * (1/8)))
+    if self.active2.poison:
+      self.active2.curHp -= min(self.hp, math.floor(self.hp * (1/8)))
+
+
     if not self.isGameOver():
       #so when ai's mon is dead, it can choose a new mon, unless both are dead, in which case it has to be done on a simutaneous turn
       while self.active2.curHp <= 0 and self.active1.curHp >= 0:
@@ -175,6 +189,10 @@ class Battle:
     lines.append("")
     lines.append("AI Player Pokemon: {0} - {1}/{2}".format(self.active2.name, self.active2.curHp, self.active2.hp))
     lines.append("")
-    lines.append("")
+    for i in range(4):
+      lines.append("{0}: {1}".format(i, self.active1.moves[i].name))
+    for i in range(6):
+      lines.append("{0}: Switch into {1}".format(i+4, self.team1[i].name))
+
 
     return "\n".join(lines)
