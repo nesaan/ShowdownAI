@@ -16,6 +16,8 @@ DEFAULT_MODIFIERS = {
   "spd": 0
 }
 
+orderedstats = ["atk", "spatk", "defn", "spdef", "spd"]
+
 class Move:
   def __init__(self, name):
     self.name = name
@@ -74,7 +76,10 @@ class Poke:
     bpbonus = 2 if move.type == "water" and self.ability == "water bubble" else 1
     bpbonus2 = 1.5 if move.bp <= 60 and self.ability == "technician" else 1
 
-    damage = ((200/5 + 2) * move.bp * bpbonus * bpbonus2 * (effectiveAtk/effectiveDef)/50 + 2)
+    if move.bp:
+      damage = (200/5 + 2) * move.bp * bpbonus * bpbonus2 * (effectiveAtk/effectiveDef)/50 + 2
+    else:
+      damage = 0
     targets = 1
     weather = 1
     crit = random.choices([1, 1.5], [100 - 6.25, 6.25])[0]
@@ -96,13 +101,27 @@ class Poke:
 
 
 class Battle:
-  def __init__(self, ai):
+  def __init__(self, ai, render=""):
     self.ai = ai
     self.team1 = [Poke("Alakazam"), Poke("Victini"), Poke("Araquanid"), Poke("Scizor"), Poke("Excadrill"), Poke("Mega-Latios")]
     self.team2 = [Poke("Alakazam"), Poke("Victini"), Poke("Araquanid"), Poke("Scizor"), Poke("Excadrill"), Poke("Mega-Latios")]
     self.active1 = self.team1[0]
     self.active2 = self.team2[0]
+    self.render = render
+    for i in range(6):
+      self.team1[i].index = i
+      self.team2[i].index = i
+
+  def reward(self, valid):
+    if valid:
+      return 10
+    else:
+      return -30000000
   
+  def observe(self):
+    return [self.active1.index, self.active2.index] + [x.curHp for x in self.team1] + [x.curHp for x in self.team2] \
+      + [self.active1.modifiers[x] for x in orderedstats] + [self.active2.modifiers[x] for x in orderedstats]
+
   def isGameOver(self):
     return all(mon.curHp <= 0 for mon in self.team1) or all(mon.curHp <= 0 for mon in self.team2)
   
@@ -133,7 +152,7 @@ class Battle:
   def makeMove(self, pmove):
     #maybe should check later but i am assuming the ai never makes invalaid moves, but player might because they are either a human or a training ai
     if isinstance(pmove, Poke) and (pmove.curHp <= 0 or pmove == self.active1):
-      return
+      return False
     
     if self.active1.curHp <= 0:
       if isinstance(pmove, Poke):
@@ -143,7 +162,8 @@ class Battle:
             raise Exception("Reallyyy bad AI choice, is this guy trained?")
           self.executeAiAction(aimove)
         self.executePAction(pmove)
-      return
+        return True
+      return False
 
     aimove = self.ai.chooseAction(self.active2, self.team2, self.active1, self.team1)
     if isinstance(aimove, Poke) and (aimove.curHp <= 0 or aimove == self.active2):
@@ -174,31 +194,33 @@ class Battle:
     self.active1.grounded = False
     self.active2.grounded = False
     if self.active1.poison and self.active1.ability != "magic guard":
-      self.active1.curHp -= min(self.hp, math.floor(self.hp * (1/8)))
+      self.active1.curHp -= min(self.active1.hp, math.floor(self.active1.hp * (1/8)))
     if self.active2.poison and self.active2.ability != "magic guard":
-      self.active2.curHp -= min(self.hp, math.floor(self.hp * (1/8)))
+      self.active2.curHp -= min(self.active2.hp, math.floor(self.active2.hp * (1/8)))
 
 
     if not self.isGameOver():
       #so when ai's mon is dead, it can choose a new mon, unless both are dead, in which case it has to be done on a simutaneous turn
-      while self.active2.curHp <= 0 and self.active1.curHp >= 0:
+      while self.active2.curHp <= 0 and self.active1.curHp > 0:
         aimove = self.ai.chooseAction(self.active2, self.team2, self.active1, self.team1)
         if not isinstance(aimove, Poke):
           raise Exception("Really bad AI choice, is this guy trained?")
         self.executeAiAction(aimove)
+    return True
 
 
 
   def __repr__(self):
     lines = []
+    lines.append("----------------------------------------------------------------------------")
     lines.append("Active Player Pokemon: {0} - {1}/{2}".format(self.active1.name, self.active1.curHp, self.active1.hp))
-    lines.append("")
     lines.append("AI Player Pokemon: {0} - {1}/{2}".format(self.active2.name, self.active2.curHp, self.active2.hp))
     lines.append("")
-    for i in range(4):
-      lines.append("{0}: {1}".format(i, self.active1.moves[i].name))
-    for i in range(6):
-      lines.append("{0}: Switch into {1}".format(i+4, self.team1[i].name))
+    if "a" in self.render:
+      for i in range(4):
+        lines.append("{0}: {1}".format(i, self.active1.moves[i].name))
+      for i in range(6):
+        lines.append("{0}: Switch into {1}".format(i+4, self.team1[i].name))
 
 
     return "\n".join(lines)
