@@ -47,6 +47,7 @@ class Poke:
     self.prio = 9
     self.flinch = False
     self.poison = False
+    self.grounded = False
 
   def stab(self, move):
     return move.type in self.types
@@ -58,8 +59,8 @@ class Poke:
   def useMove(self, move, other):
     if self.curHp <= 0:
       return
-
-    hit = random.choices([True, False], [move.acc, 1 - move.acc])[0]
+    bonusacc = 1.1 if self.ability == "victory star" else 1
+    hit = random.choices([True, False], [move.acc * bonusacc, 1 - move.acc*bonusacc])[0]
     if not hit:
       return 0
 
@@ -69,8 +70,11 @@ class Poke:
     else:
       effectiveAtk = self.spatk * self.statboost("spatk")
       effectiveDef = other.spdef * other.statboost("spdef")
-    
-    damage = ((200/5 + 2) * move.bp * (effectiveAtk/effectiveDef)/50 + 2)
+
+    bpbonus = 2 if move.type == "water" and self.ability == "water bubble" else 1
+    bpbonus2 = 1.5 if move.bp <= 60 and self.ability == "technician" else 1
+
+    damage = ((200/5 + 2) * move.bp * bpbonus * bpbonus2 * (effectiveAtk/effectiveDef)/50 + 2)
     targets = 1
     weather = 1
     crit = random.choices([1, 1.5], [100 - 6.25, 6.25])[0]
@@ -80,10 +84,10 @@ class Poke:
     #status not implemented
     burn = 1
     #items not implemented
-    remainder = 1
-
+    remainder = 0.5 if move.type == "fire" and other.ability == "water bubble" else 1
+    remainder2 = 0 if move.type == "ground" and other.ability == "levitate" and not self.ability == "moldbreaker" and not other.grounded else 1
     
-    total = min(math.floor(damage * targets * weather * crit * randf * stab * eff * burn * remainder), other.curHp)
+    total = min(math.floor(damage * targets * weather * crit * randf * stab * eff * burn * remainder * remainder2), other.curHp)
     other.curHp -= total
     if other.curHp > 0:
       move.secondary(self, other)
@@ -167,9 +171,11 @@ class Battle:
     # post turn cleanup
     self.active1.flinch = False
     self.active2.flinch = False
-    if self.active1.poison:
+    self.active1.grounded = False
+    self.active2.grounded = False
+    if self.active1.poison and self.active1.ability != "magic guard":
       self.active1.curHp -= min(self.hp, math.floor(self.hp * (1/8)))
-    if self.active2.poison:
+    if self.active2.poison and self.active2.ability != "magic guard":
       self.active2.curHp -= min(self.hp, math.floor(self.hp * (1/8)))
 
 

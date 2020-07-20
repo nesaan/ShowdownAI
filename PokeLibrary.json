@@ -7,7 +7,8 @@
     "spdef": 227,
     "spd": 372,
     "moves": ["psychic", "shadow ball", "focus blast", "dazzling gleam"],
-    "types": ["psychic"]
+    "types": ["psychic"],
+    "ability": "magic guard"
   },
   "Victini": {
     "hp": 404,
@@ -17,7 +18,8 @@
     "spdef": 236,
     "spd": 328,
     "moves": ["v-create", "bolt strike", "final gambit", "zen headbutt"],
-    "types": ["psychic", "fire"]
+    "types": ["psychic", "fire"],
+    "ability": "victory star"
   },
   "Araquanid": {
     "hp": 340,
@@ -27,7 +29,8 @@
     "spdef": 300,
     "spd": 120,
     "moves": ["liquidation", "crunch", "poison jab", "x-scissor"],
-    "types": ["bug", "water"]
+    "types": ["bug", "water"],
+    "ability": "water bubble"
   },
   "Scizor": {
     "hp": 323,
@@ -37,7 +40,8 @@
     "spdef": 197,
     "spd": 187,
     "moves": ["bug bite", "bullet punch", "agility", "superpower"],
-    "types": ["bug", "steel"]
+    "types": ["bug", "steel"],
+    "ability": "technician"
   },
   "Excadrill": {
     "hp": 362,
@@ -47,7 +51,8 @@
     "spdef": 229,
     "spd": 212,
     "moves": ["earthquake", "iron head", "rock slide", "swords dance"],
-    "types": ["ground", "steel"]
+    "types": ["ground", "steel"],
+    "ability": "moldbreaker"
   },
   "Mega-Latios": {
     "hp": 301,
@@ -57,6 +62,7 @@
     "spdef": 277,
     "spd": 319,
     "moves": ["dragon dance", "dragon claw", "earthquake", "roost"],
-    "types": ["psychic", "dragon"]
+    "types": ["psychic", "dragon"],
+    "ability": "levitate"
   }
 }

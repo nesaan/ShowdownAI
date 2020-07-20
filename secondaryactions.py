@@ -84,6 +84,7 @@ def dragonclaw(attk, defn):
 
 def roost(attk, defn):
   attk.curHp += math.floor(attk.hp / 2)
+  attk.grounded = True
 
 
 
