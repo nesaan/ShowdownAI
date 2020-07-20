@@ -24,14 +24,14 @@ class ShowdownGym(gym.Env):
     return np.array(self.battle.observe())
 
   def step(self, action):
-    if action >= 4:
-      action_object = battle.active1.moves[action]
+    if action < 4:
+      action_object = self.battle.active1.moves[action]
     else:
-      action_object = battle.team1[action]
+      action_object = self.battle.team1[action - 4]
     valid = self.battle.makeMove(action_object)  
     done = bool(self.battle.isGameOver())
     
-    reward = battle.reward(valid)
+    reward = self.battle.reward(valid)
 
     # Optionally we can pass additional info, we are not using that for now
     info = {}

@@ -1,6 +1,6 @@
-from battle import *
-from baseai import *
+from showdowngym import ShowdownGym
+from stable_baselines.common.env_checker import check_env
+from baseai import BaseAi
 
-ex = Battle(BaseAi)
-
-print (ex.observe())
+env = ShowdownGym(BaseAi())
+check_env(env, warn=True)
